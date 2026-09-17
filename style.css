@@ -1,0 +1,186 @@
+:root {
+  font-family: Arial, sans-serif;
+  color: #f5f5f5;
+  background: #090909;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, #171717 0%, #090909 45%, #050505 100%);
+}
+
+.container {
+  width: min(720px, 92%);
+  margin: 0 auto;
+  padding: 60px 0;
+}
+
+.card {
+  background: #111;
+  border: 1px solid #292929;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid #444;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+h1 {
+  margin: 18px 0 8px;
+  font-size: 34px;
+}
+
+.descricao {
+  color: #aaa;
+  line-height: 1.5;
+}
+
+.formatos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.formatos div {
+  background: #181818;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.formatos span {
+  display: block;
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 7px;
+}
+
+.formatos strong {
+  font-family: monospace;
+  font-size: 16px;
+}
+
+.upload {
+  display: block;
+  border: 2px dashed #3a3a3a;
+  border-radius: 14px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.upload:hover {
+  border-color: #777;
+  background: #151515;
+}
+
+.upload input {
+  display: none;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.icone {
+  font-size: 35px;
+}
+
+.upload-content span {
+  color: #888;
+  font-size: 13px;
+}
+
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+  background: #fff;
+  color: #000;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+
+.status {
+  min-height: 24px;
+  margin-top: 16px;
+  text-align: center;
+  color: #bbb;
+}
+
+.exemplo {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid #292929;
+}
+
+.exemplo h2 {
+  font-size: 18px;
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+code {
+  background: #191919;
+  border: 1px solid #292929;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.exemplo p {
+  color: #777;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 25px 0;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  h1 {
+    font-size: 27px;
+  }
+
+  .formatos {
+    grid-template-columns: 1fr;
+  }
+
+  .linha {
+    flex-wrap: wrap;
+  }
+}

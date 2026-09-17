@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formatador + IN100 - Beta 1</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <div class="card">
+      <div class="badge">BETA 1</div>
+
+      <h1>Formatador + Consulta IN100</h1>
+      <p class="descricao">
+        Formate o CPF e o benefício, consulte o IN100 e gere o resultado final.
+      </p>
+
+      <div class="formatos">
+        <div>
+          <span>1ª coluna</span>
+          <strong>000.000.000-00</strong>
+        </div>
+
+        <div>
+          <span>2ª coluna</span>
+          <strong>0000000000</strong>
+        </div>
+      </div>
+
+      <form id="formulario">
+        <label class="upload">
+          <input
+            type="file"
+            id="arquivo"
+            name="arquivo"
+            accept=".xlsx,.xls"
+            required
+          >
+
+          <div class="upload-content">
+            <div class="icone">📄</div>
+            <strong>Escolha sua planilha</strong>
+            <span id="nomeArquivo">XLSX ou XLS</span>
+          </div>
+        </label>
+
+        <button type="submit" id="btnProcessar">
+          Formatar e consultar IN100
+        </button>
+      </form>
+
+      <div id="status" class="status"></div>
+
+      <div class="exemplo">
+        <h2>Resultado</h2>
+
+        <div class="linha">
+          <code>4512343312</code>
+          <span>→</span>
+          <code>045.123.433-12</code>
+        </div>
+
+        <div class="linha">
+          <code>123456789</code>
+          <span>→</span>
+          <code>0123456789</code>
+        </div>
+
+        <p>
+          A planilha final terá: CPF, benefício, status do benefício e margem.
+          Valores de margem negativos também são preservados.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
