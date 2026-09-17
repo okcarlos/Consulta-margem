@@ -30,10 +30,10 @@ formulario.addEventListener("submit", async (event) => {
   status.textContent = "Formatando e consultando IN100. Isso pode levar alguns minutos...";
 
   try {
-    const resposta = await fetch("api-in100.onrender.com/api/processar", {
-      method: "POST",
-      body: formData
-    });
+    const resposta = await fetch("https://api-in100.onrender.com/api/processar", {
+    method: "POST",
+    body: formData
+  });
 
     console.log("STATUS:", resposta.status);
     console.log("STATUS TEXT:", resposta.statusText);
