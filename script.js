@@ -199,6 +199,9 @@ formulario.addEventListener("submit", async (event) => {
 
         eventos.close();
 
+        btnProcessar.disabled = false;
+        btnProcessar.textContent = "Processar planilha";
+
         // Pequena espera para mostrar "Concluído"
         setTimeout(() => {
           const link =
@@ -233,6 +236,9 @@ formulario.addEventListener("submit", async (event) => {
           JSON.parse(event.data);
 
         eventos.close();
+
+        btnProcessar.disabled = false;
+        btnProcessar.textContent = "Processar planilha";
 
         throw new Error(
           dados.mensagem ||
