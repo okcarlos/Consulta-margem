@@ -590,15 +590,26 @@ function abrirSSE() {
   // ----------------------------------------------------------
 
   eventos.onerror =
-    (erro) => {
+  (erro) => {
 
-      console.warn(
-        "Conexão SSE perdida. O EventSource tentará reconectar.",
-        erro
-      );
+    console.warn(
+      "Conexão SSE perdida. Não haverá reconexão automática.",
+      erro
+    );
 
-      status.textContent =
-        "Processamento em andamento... reconectando conexão de progresso.";
+    // Fecha definitivamente esta conexão SSE.
+    // Isso impede o EventSource de tentar reconectar.
+    if (eventos) {
+      eventos.close();
+      eventos = null;
+    }
+
+    status.textContent =
+      "Conexão de progresso perdida. A tarefa continua sendo processada.";
+
+    // Continua acompanhando a tarefa diretamente pela API.
+    iniciarFallback();
+  };
 
       // ------------------------------------------------------
       // IMPORTANTE:
