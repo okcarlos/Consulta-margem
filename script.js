@@ -24,6 +24,7 @@ let eventos = null;
 let tarefaId = null;
 let processamentoFinalizado = false;
 let intervaloFallback = null;
+let sseAberto = false;
 
 // ============================================================
 // ARQUIVO SELECIONADO
@@ -33,9 +34,7 @@ arquivoInput.addEventListener(
   "change",
   () => {
 
-    if (
-      arquivoInput.files.length > 0
-    ) {
+    if (arquivoInput.files.length > 0) {
 
       nomeArquivo.textContent =
         arquivoInput.files[0].name;
@@ -67,13 +66,12 @@ function atualizarProgresso(
 }
 
 // ============================================================
-// FINALIZAR INTERFACE
+// LIBERAR INTERFACE
 // ============================================================
 
 function liberarInterface() {
 
-  btnProcessar.disabled =
-    false;
+  btnProcessar.disabled = false;
 
   btnProcessar.textContent =
     "Processar planilha";
@@ -91,8 +89,7 @@ function pararFallback() {
       intervaloFallback
     );
 
-    intervaloFallback =
-      null;
+    intervaloFallback = null;
   }
 }
 
@@ -100,9 +97,7 @@ function pararFallback() {
 // DOWNLOAD
 // ============================================================
 
-function baixarResultado(
-  download
-) {
+function baixarResultado(download) {
 
   if (!download) {
 
@@ -129,9 +124,7 @@ function baixarResultado(
       link.download =
         "resultado_in100.xlsx";
 
-      document.body.appendChild(
-        link
-      );
+      document.body.appendChild(link);
 
       link.click();
 
@@ -151,20 +144,17 @@ function baixarResultado(
 // PROCESSAMENTO CONCLUÍDO
 // ============================================================
 
-function processamentoConcluido(
-  dados
-) {
+function processamentoConcluido(dados) {
 
-  if (
-    processamentoFinalizado
-  ) {
+  if (processamentoFinalizado) {
     return;
   }
 
-  processamentoFinalizado =
-    true;
+  processamentoFinalizado = true;
 
   pararFallback();
+
+  sseAberto = false;
 
   if (eventos) {
 
@@ -182,11 +172,11 @@ function processamentoConcluido(
 // ERRO DA TAREFA
 // ============================================================
 
-function erroProcessamento(
-  mensagem
-) {
+function erroProcessamento(mensagem) {
 
   pararFallback();
+
+  sseAberto = false;
 
   if (eventos) {
 
@@ -230,13 +220,7 @@ async function consultarStatusTarefa() {
         }
       );
 
-    // --------------------------------------------------------
-    // TAREFA NÃO ENCONTRADA
-    // --------------------------------------------------------
-
-    if (
-      resposta.status === 404
-    ) {
+    if (resposta.status === 404) {
 
       console.warn(
         "Tarefa não encontrada no servidor."
@@ -255,9 +239,7 @@ async function consultarStatusTarefa() {
     const dados =
       await resposta.json();
 
-    if (
-      !dados.encontrada
-    ) {
+    if (!dados.encontrada) {
       return;
     }
 
@@ -278,16 +260,11 @@ async function consultarStatusTarefa() {
     // CONCLUÍDO
     // --------------------------------------------------------
 
-    if (
-      dados.concluida
-    ) {
+    if (dados.concluida) {
 
       processamentoConcluido({
-        total:
-          dados.total,
-
-        download:
-          dados.download
+        total: dados.total,
+        download: dados.download
       });
 
       return;
@@ -338,10 +315,8 @@ function iniciarFallback() {
 
   pararFallback();
 
-  // Consulta imediatamente
   consultarStatusTarefa();
 
-  // Depois consulta periodicamente
   intervaloFallback =
     setInterval(
       consultarStatusTarefa,
@@ -350,7 +325,7 @@ function iniciarFallback() {
 }
 
 // ============================================================
-// ABRIR SSE
+// ABRIR SSE — UMA ÚNICA VEZ
 // ============================================================
 
 function abrirSSE() {
@@ -359,15 +334,20 @@ function abrirSSE() {
     return;
   }
 
-  if (eventos) {
+  if (sseAberto) {
 
-    eventos.close();
+    console.warn(
+      "SSE já aberto para esta tarefa:",
+      tarefaId
+    );
 
-    eventos = null;
+    return;
   }
 
+  sseAberto = true;
+
   console.log(
-    "Abrindo SSE:",
+    "Abrindo SSE UMA VEZ:",
     tarefaId
   );
 
@@ -376,9 +356,9 @@ function abrirSSE() {
       `${API_BASE}/api/progresso/${tarefaId}`
     );
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // INÍCIO
-  // ----------------------------------------------------------
+  // ==========================================================
 
   eventos.addEventListener(
     "inicio",
@@ -390,11 +370,6 @@ function abrirSSE() {
           JSON.parse(
             event.data
           );
-
-        console.log(
-          "Total de clientes:",
-          dados.total
-        );
 
         status.textContent =
           `Consultando IN100... 0 de ${dados.total}`;
@@ -409,9 +384,9 @@ function abrirSSE() {
     }
   );
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // CONSULTANDO
-  // ----------------------------------------------------------
+  // ==========================================================
 
   eventos.addEventListener(
     "consultando",
@@ -452,9 +427,9 @@ function abrirSSE() {
     }
   );
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // PROGRESSO
-  // ----------------------------------------------------------
+  // ==========================================================
 
   eventos.addEventListener(
     "progresso",
@@ -483,9 +458,9 @@ function abrirSSE() {
     }
   );
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // FINALIZANDO
-  // ----------------------------------------------------------
+  // ==========================================================
 
   eventos.addEventListener(
     "finalizando",
@@ -511,9 +486,9 @@ function abrirSSE() {
     }
   );
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // CONCLUÍDO
-  // ----------------------------------------------------------
+  // ==========================================================
 
   eventos.addEventListener(
     "concluido",
@@ -540,9 +515,9 @@ function abrirSSE() {
     }
   );
 
-  // ----------------------------------------------------------
-  // ERRO
-  // ----------------------------------------------------------
+  // ==========================================================
+  // ERRO DA TAREFA
+  // ==========================================================
 
   eventos.addEventListener(
     "erro",
@@ -569,57 +544,50 @@ function abrirSSE() {
     }
   );
 
-  // ----------------------------------------------------------
-  // CONEXÃO ABERTA
-  // ----------------------------------------------------------
+  // ==========================================================
+  // SSE CONECTADO
+  // ==========================================================
 
   eventos.onopen =
     () => {
 
       console.log(
-        "SSE conectado."
+        "SSE conectado:",
+        tarefaId
       );
 
-      // Quando reconectar,
-      // consulta o estado atual também.
       consultarStatusTarefa();
     };
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // ERRO SSE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   eventos.onerror =
-  (erro) => {
+    (erro) => {
 
-    console.warn(
-      "Conexão SSE perdida. Não haverá reconexão automática.",
-      erro
-    );
+      console.warn(
+        "Conexão SSE perdida. Não será aberta novamente.",
+        erro
+      );
 
-    // Fecha definitivamente esta conexão SSE.
-    // Isso impede o EventSource de tentar reconectar.
-    if (eventos) {
-      eventos.close();
-      eventos = null;
-    }
+      if (eventos) {
 
-    status.textContent =
-      "Conexão de progresso perdida. A tarefa continua sendo processada.";
+        eventos.close();
 
-    // Continua acompanhando a tarefa diretamente pela API.
-    iniciarFallback();
-  };
+        eventos = null;
+      }
 
-      // ------------------------------------------------------
-      // IMPORTANTE:
-      //
-      // Mesmo com o SSE desconectado,
-      // consultamos o estado diretamente.
-      // ------------------------------------------------------
+      sseAberto = false;
 
+      status.textContent =
+        "Conexão de progresso perdida. A tarefa continua sendo processada.";
+
+      // NÃO abre outro SSE.
+      // Apenas consulta o status da mesma tarefa.
       iniciarFallback();
     };
+}
 
 // ============================================================
 // SUBMIT
@@ -646,10 +614,11 @@ formulario.addEventListener(
     // RESET
     // --------------------------------------------------------
 
-    processamentoFinalizado =
-      false;
+    processamentoFinalizado = false;
 
     tarefaId = null;
+
+    sseAberto = false;
 
     pararFallback();
 
@@ -672,8 +641,7 @@ formulario.addEventListener(
       arquivo
     );
 
-    btnProcessar.disabled =
-      true;
+    btnProcessar.disabled = true;
 
     btnProcessar.textContent =
       "Processando...";
@@ -684,7 +652,7 @@ formulario.addEventListener(
     try {
 
       // ======================================================
-      // 1. INICIAR PROCESSAMENTO
+      // CRIAR A TAREFA UMA ÚNICA VEZ
       // ======================================================
 
       const resposta =
@@ -695,21 +663,6 @@ formulario.addEventListener(
             body: formData
           }
         );
-
-      console.log(
-        "STATUS:",
-        resposta.status
-      );
-
-      console.log(
-        "STATUS TEXT:",
-        resposta.statusText
-      );
-
-      console.log(
-        "URL:",
-        resposta.url
-      );
 
       if (!resposta.ok) {
 
@@ -746,16 +699,16 @@ formulario.addEventListener(
       }
 
       console.log(
-        "Tarefa criada:",
+        "Tarefa criada UMA VEZ:",
         tarefaId
       );
 
-      // ======================================================
-      // 2. ABRIR SSE
-      // ======================================================
-
       status.textContent =
         "Preparando consultas...";
+
+      // ======================================================
+      // ABRIR SSE UMA ÚNICA VEZ
+      // ======================================================
 
       abrirSSE();
 
@@ -766,6 +719,8 @@ formulario.addEventListener(
       );
 
       pararFallback();
+
+      sseAberto = false;
 
       if (eventos) {
 
